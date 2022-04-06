@@ -18,15 +18,34 @@ namespace IntroductionToAPI.ConsoleApp
 
             if (response.IsSuccessStatusCode)
             {
-                var content = response.Content.ReadAsStringAsync().Result;
-                var person = JsonConvert.DeserializeObject<Person>(content);
+                // var content = response.Content.ReadAsStringAsync().Result;
+                // var person = JsonConvert.DeserializeObject<Person>(content);
 
                 Person luke = response.Content.ReadAsAsync<Person>().Result;
                 Console.WriteLine(luke.Name);
 
                 foreach (string vehiclesUrl in luke.Vehicles)
                 {
+                    HttpResponseMessage vehicleResponse = httpClient.GetAsync(vehiclesUrl).Result;
+                    // Console.WriteLine(vehicleResponse.Content.ReadAsStringAsync().Result);
 
+                    Vehicle vehicle = vehicleResponse.Content.ReadAsAsync<Vehicle>().Result;
+                    Console.WriteLine(vehicle.Name);
+                }
+            }
+
+            Console.WriteLine();
+
+            SWAPIService service = new SWAPIService();
+            Person person = service.GetPersonAsync("https://swapi.dev/api/people/11").Result;
+            if (person != null)
+            {
+                Console.WriteLine(person.Name);
+
+                foreach (var vehiclesUrl in person.Vehicles)
+                {
+                    var vehicle = service.GetVehicleAsync(vehiclesUrl).Result;
+                    Console.WriteLine(vehicle.Name);
                 }
             }
         }
